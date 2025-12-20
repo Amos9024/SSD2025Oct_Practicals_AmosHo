@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Amos9024/SSD2025Oct_Practicals_AmosHo#readme",
   "dependencies": {
+    "chalk": "^5.6.2",
     "express": "^5.2.1"
   }
 }
