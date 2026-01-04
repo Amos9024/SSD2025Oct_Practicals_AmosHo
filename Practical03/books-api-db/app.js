@@ -153,12 +153,13 @@ app.put("/books/:id", async(req, res) => {
 
 app.delete("/books/:id", async(req, res) => {
   const bookId = Number(req.params.id);
-  const { title, author } = req.body;
+  /* const { title, author } = req.body;
   if (!title || !author) {
     return res
       .status(400)
       .json({ message: "Cannot delete: title and author are required." });
   }
+  */
   let connection;
   try {
     connection = await sql.connect(dbConfig); // Get the database connection

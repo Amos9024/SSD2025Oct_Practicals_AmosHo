@@ -1,0 +1,4 @@
+Reflection
+1) It is diffciult to read as each routes has repeating patterns for same Database connections. If one of the routes database connections is incorrect, we have to change for all routes.
+2) One of the way to isolate and fix the bug in book creation fucntion is to have separate functions. 
+3) It is diffciult to understand the flow for each route as it the queries look very similar. 
