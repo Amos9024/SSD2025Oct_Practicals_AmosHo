@@ -1,0 +1,16 @@
+Q2
+1) What did you learn about REST APIs?
+    I learned that APIs are deployed in every application we are currently using. APIs are used to allow 
+    software components to communicate and share data. REST APIs communicate through HTTP requests like create, read, update and delete records.
+2) How did you understand the use of HTTP methods (GET, POST, PUT, DELETE)?
+    I understood the use of HTTP methods by telling the server what type of actions i want. Based on the actions, the server will manage the resources accordingly.
+    Get is to retrieve data from the server. Post is to send and create data to server. Put is to update the data in the server. Delete is to delete the data in the server. 
+3) Did you face any challenges while building the CRUD operations?
+    Yes, i did face challenges while building the CRUD opertions. One of the challenges is understanding the different HTTP status code for troubleshooting purposes.
+    Beside that, another challenge is understanding the different terms when deciding what type of actions i want. 
+
+Q3
+1) Why use POST for creating resources and PUT for updating?
+    Post is for creating new data in the server. Put is to udpate or replace a data which is already exists in the server.
+2) What status code should be returned when attempting to update a non-existent resource?
+    The HTTP status code is 404. 

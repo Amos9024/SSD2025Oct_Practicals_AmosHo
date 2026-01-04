@@ -1,0 +1,26 @@
+Short report
+The role of the following elements in the food-api are:
+1) app.use(express.json()) 
+    app.use is a middleware to parse incoming request with JSON payload. express.json() parse the JSON 
+    string and converts it into Javascript object so that we can access it with req.body. 
+2) req.body
+    req.body sends data by the client in the request body. The data send by the client will be stored or created on the database server. 
+3) req.query
+    req.query is an object which contains a set of key-value paris representing the query parameters of the URL. 
+4) req.params.id
+    This allows the server to identify specific resources for data retreiving or updating. 
+
+Using different HTTP methods (e.g., GET, POST, PUT,DELETE) in an API is significant because it provides a clear, standardized way to describe the intend action on the 
+resource, aligning with the principles of RESTful architecture. 
+Here's how they (CRUD) are relate to HTTP Methods as follows:
+1) POST   -> Create
+2) GET    -> Read
+3) PUT    -> Update
+4) DELETE -> DELETE
+
+Explain the meaning of these HTTP status codes:
+200 OK -> This is a Standard success status code. THis indicates that the client's request was successfully received. 
+201 Created -> This is success code indicates that the request has been fulfilled and resulted in a creation of new resource.
+400 Bad Request -> This is a client error code indicating that the server will not process the request because it is perceived to be a client error. 
+404 Not Found -> This is a client error code indciating that the server cannot find the requested resource. 
+500 Internal Server Error -> This is generic server code indicating that the server encountered an unexpected condition that prevented it from fulfilling the request. 
