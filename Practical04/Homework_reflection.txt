@@ -1,0 +1,16 @@
+Task 1
+1) The code was refactored by separating it as follows: moving business logic into models,
+request coordination into controllers and presentation into views. This helps to improve readability
+testability and maintainability.
+2) The main challenges is to decide which part belongs to the model or controllers. One of the way 
+to reduce issues is to test frequently and ensure it works normally as per the initial design.
+3) MVC structured is good because it allows us to add or modify the features without touching the large file.\
+4) MVC structured makes it easier to understand as it split into models, controllers and views instead of 
+everything being in one file (app.js). It makes in clearer where to add or fix stuff. 
+5) It makes the code easier to understand and easier to fix without breaking other areas.
+Task 2 
+1) Implementing input validation middleware helps to catch bad input early and return clear error message
+instead of crashing the application. An example is email must be valid or password must be at least 8 characters.
+2) Parameterized queries prevent sql injection by keeping the sql code separate from the data. 
+The input is treated as a text and not as code so the sql commands is not altered. 
+3) We can show generic messages like something is wrong so that the API keeps the sensitive information hidden.
