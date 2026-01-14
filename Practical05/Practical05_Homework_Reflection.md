@@ -1,0 +1,5 @@
+Task 2:
+1) Model is for data and business logic. View is the user interface that operates outside the backend project. Controller is the middleman between the Model and View. In the case of having a separate frontend view help to reduce the work for the backend and allow it to focus on a single work. 
+2) The API stage (Practical 04) made it easiest to spot and fix data handling or response to bugs. This is becasue the validation code and error handling is present. This made it traceable.
+3) The most challenging part is between practical 4 and 5 because it is intergrating it with the frontend. More time is required to solve the problem face in practical 5. Adding a new feature is more organized, modular and less prone to error. This is because we can update the models, controllers and middleware.    
+4) Hands-on coding and refactoring help to turn into abstract concepts into practical usage. Testing also help to understand the concepts and the flow. 
