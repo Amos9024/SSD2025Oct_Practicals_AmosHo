@@ -28,7 +28,7 @@ async function fetchBookData(bookId) {
         .get("content-type")
         ?.includes("application/json")
         ? await response.json()
-        : { message: response.statusText };
+        : { message: response.statusText, error: response.error };
       // Throw an error with status and message
       throw new Error(
         `HTTP error! status: ${response.status}, message: ${errorBody.message}`
@@ -95,50 +95,58 @@ editBookForm.addEventListener("submit", async (event) => {
   //alert("Update logic needs to be implemented!"); // Placeholder alert
 
   // TODO: Collect updated data from form fields (editTitleInput.value, editAuthorInput.value)
-    const updateBookData = {
+  const updateBookData = {
     title: editTitleInput.value,
     author: editAuthorInput.value,
-    };
+  };
+
   // TODO: Get the book ID from the hidden input (bookIdInput.value)
   bookId = document.getElementById("bookId").value;
-  // TODO: Implement the fetch PUT request to the API endpoint /books/:id
-  
 
   try {
-    // Make a PUT request to your API endpoint
+    // TODO: Implement the fetch PUT request to the API endpoint /books/:id
     const response = await fetch(`${apiBaseUrl}/books/${bookId}`, {
-      method: "PUT", // Specify the HTTP method
-      headers: {
-        "Content-Type": "application/json", // Tell the API we are sending JSON
-      },
-      body: JSON.stringify(updateBookData), // Send the data as a JSON string in the request body
-    });
-  // TODO: Include the updated data in the request body (as JSON string)
-  // TODO: Set the 'Content-Type': 'application/json' header
-  // TODO: Handle the API response (check status 200 for success, 400 for validation, 404 if book not found, 500 for server error)
-  if (response.status === 200) {
-      const responseBody = await response.json();
-      messageDiv.textContent = `Book updated successfully! ID: ${responseBody.id}`;
-      messageDiv.style.color = "green";
-      console.log("Updated Book:", responseBody);
-    } else if (response.status === 400) {
-      // Handle validation errors from the API (from Practical 04 validation middleware)
-      messageDiv.textContent = `Validation Error: ${responseBody.message}`;
-      messageDiv.style.color = "red";
-      console.error("Validation Error:", responseBody);
-    } else {
-      // Handle other potential API errors (e.g., 500 from error handling middleware)
-      throw new Error(
-        `API error! status: ${response.status}, message: ${responseBody.message}`
-      );
+        method: "PUT", // Specify the HTTP method
+        // TODO: Include the updated data in the request body (as JSON string)
+        body: JSON.stringify(updateBookData), // Send the data as a JSON string in the request body
+        // TODO: Set the 'Content-Type': 'application/json' header
+        headers: {
+            "Content-Type": "application/json", // Tell the API we are sending JSON
+        },
+      });
+
+    const responseBody = response.headers
+      .get("content-type")
+      ?.includes("application/json")
+      ? await response.json()
+      : { message: response.statusText, error: response.error };
+        
+    // TODO: Handle the API response (check status 200 for success, 400 for validation, 404 if book not found, 500 for server error)
+    if (response.status === 200) { 
+        // If the response is successful (status 200)
+        messageDiv.textContent = "Book updated successfully!";
+        messageDiv.style.color = "green";
     }
-}catch (error) {
-    console.error("Error creating book:", error);
-    messageDiv.textContent = `Failed to create book: ${error.message}`;
-    messageDiv.style.color = "red";
+    else if (response.status === 400) {
+        // Handle validation errors from the API (from Practical 04 validation middleware)
+        messageDiv.textContent = `Validation Error: ${responseBody.error}`;
+        messageDiv.style.color = "red";
+        console.error("Validation Error:", responseBody);
+    } else {
+        // Handle other potential API errors (e.g., 500 from error handling middleware)
+        throw new Error(
+            `API error! status: ${response.status}, message: ${responseBody.message}`
+        );
+    }
   }
   // TODO: Provide feedback to the user using the messageDiv (success or error messages)
+  catch (error) {
+    console.error("Error updating book:", error);
+    messageDiv.textContent = `Failed to update book: ${error.message}`;
+    messageDiv.style.color = "red";
+  }
   // TODO: Optionally, redirect back to the index page on successful update
+  window.location.href = "index.html";  
 });
 
 // --- End of code for learners to complete ---

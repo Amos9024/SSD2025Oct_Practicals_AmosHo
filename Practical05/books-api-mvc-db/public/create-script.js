@@ -32,7 +32,7 @@ createBookForm.addEventListener("submit", async (event) => {
       .get("content-type")
       ?.includes("application/json")
       ? await response.json()
-      : { message: response.statusText };
+      : { message: response.statusText, error: response.error };
 
     if (response.status === 201) {
       messageDiv.textContent = `Book created successfully! ID: ${responseBody.id}`;
@@ -41,7 +41,7 @@ createBookForm.addEventListener("submit", async (event) => {
       console.log("Created Book:", responseBody);
     } else if (response.status === 400) {
       // Handle validation errors from the API (from Practical 04 validation middleware)
-      messageDiv.textContent = `Validation Error: ${responseBody.message}`;
+      messageDiv.textContent = `Validation Error: ${responseBody.error}`;
       messageDiv.style.color = "red";
       console.error("Validation Error:", responseBody);
     } else {

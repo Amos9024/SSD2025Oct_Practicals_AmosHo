@@ -15,27 +15,22 @@ const {
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Middleware (Parsing request bodies)
+// Middleware
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
-// --- Add other general middleware here (e.g., logging, security headers) ---
 
 // --- Serve static files from the 'public' directory ---
 // When a request comes in for a static file (like /index.html, /styles.css, /script.js),
 // Express will look for it in the 'public' folder relative to the project root.
 app.use(express.static(path.join(__dirname, "public")));
 
-
-
-
 // Routes for books
-// Apply middleware *before* the controller function for routes that need it
+// Link specific URL paths to the corresponding controller functions
 app.get("/books", bookController.getAllBooks);
-app.get("/books/:id", validateBookId, bookController.getBookById); // Use validateBookId middleware
-app.post("/books", validateBook, bookController.createBook); // Use validateBook middleware
-// Add routes for PUT/DELETE if implemented, applying appropriate middleware
-app.put("/books/:id", validateBookId, validateBook, bookController.updateBook); // Use both middlewares
-app.delete("/books/:id", validateBookId, bookController.deleteBook); // Use validateBookId middleware
+app.get("/books/:id", validateBookId, bookController.getBookById);
+app.post("/books", validateBook, bookController.createBook);
+app.put("/books/:id", validateBookId, validateBook, bookController.updateBook);
+app.delete("/books/:id", validateBookId, bookController.deleteBook);
 
 // Start server
 app.listen(port, () => {
@@ -43,9 +38,11 @@ app.listen(port, () => {
 });
 
 // Graceful shutdown
+// Listen for termination signals (like Ctrl+C)
 process.on("SIGINT", async () => {
   console.log("Server is gracefully shutting down");
+  // Close any open connections
   await sql.close();
   console.log("Database connections closed");
-  process.exit(0);
+  process.exit(0); // Exit the process
 });

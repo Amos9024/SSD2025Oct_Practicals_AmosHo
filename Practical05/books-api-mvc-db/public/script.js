@@ -64,8 +64,8 @@ async function fetchBooks() {
 function viewBookDetails(bookId) {
   console.log("View details for book ID:", bookId);
   // In a real app, redirect to view.html or show a modal
-  // window.location.href = `view.html?id=${bookId}`; // Assuming you create view.html
-  alert(`View details for book ID: ${bookId} (Not implemented yet)`);
+  window.location.href = `view.html?id=${bookId}`; // Assuming you create view.html
+  //alert(`View details for book ID: ${bookId} (Not implemented yet)`);
 }
 
 function editBook(bookId) {
@@ -75,17 +75,55 @@ function editBook(bookId) {
 }
 
 // Placeholder/Partial implementation for Delete (will be completed by learners)
-function handleDeleteClick(event) {
+async function handleDeleteClick(event) {
   const bookId = event.target.getAttribute("data-id");
+  //alert("BookID: " + bookId);
   console.log("Attempting to delete book with ID:", bookId);
   // --- Start of code for learners to complete ---
-  alert(
-    `Attempting to delete book with ID: ${bookId} (Not implemented yet)`
-  );
+  // alert(
+  //   `Attempting to delete book with ID: ${bookId} (Not implemented yet)`
+  // );
   // TODO: Implement the fetch DELETE request here
-  
-  // TODO: Handle success (204) and error responses (404, 500)
-  // TODO: On successful deletion, remove the book element from the DOM
+  try {
+    const response = await fetch(`${apiBaseUrl}/books/${bookId}`, {
+      method: "DELETE", // Specify the HTTP method
+      headers: {
+        "Content-Type": "application/json", // Tell the API we are sending JSON
+      },
+    });
+
+    // TODO: Set the 'Content-Type': 'application/json' header
+    const responseBody = response.headers
+      .get("content-type")
+      ?.includes("application/json")
+      ? await response.json()
+      : { message: response.statusText, error: response.error };
+
+    // TODO: Handle success (204, 200) and error responses (404, 500)
+    if (response.status === 204 || response.status === 200) {
+      messageDiv.textContent = `Book deleted successfully! ID: ${bookId}`;
+      messageDiv.style.color = "green";
+      // TODO: On successful deletion, remove the book element from the DOM
+      const bookElement = event.target.closest(".book-item");
+      if (bookElement) {
+        bookElement.remove();
+      }    
+    } else if (response.status === 404) {
+      // Handle book not found error
+      messageDiv.textContent = `Book Not Found Error: ${responseBody.message}`;
+      messageDiv.style.color = "red";
+      console.error("Book Not Found Error:", responseBody);
+    } else {
+      // Handle other potential API errors (e.g., 500 from error handling middleware)
+      throw new Error(
+        `API error! status: ${response.status}, message: ${responseBody.message}`
+      );
+    }
+  } catch (error) {
+    console.error("Error deleting book:", error);
+    messageDiv.textContent = `Failed to delete book: ${error.message}`;
+    messageDiv.style.color = "red";
+  }
   // --- End of code for learners to complete ---
 }
 
