@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Student Details</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+      }
+      form div {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type="text"] {
+        width: 300px;
+        padding: 8px;
+        /* border: 1px solid #ccc;
+        border-radius: 4px; */
+        border: none; /* Removes the standard border */
+        background-color: lightgoldenrodyellow; /* Light yellow background to indicate read-only */
+        outline: none; /* Removes the blue/orange highlight that appears on focus in some browsers */
+      }
+      button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      #message {
+        margin-top: 15px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>View Student Details</h1>
+    <p><a href="index.html">Back to Students List</a></p>
+
+    <div id="loadingMessage">Loading student data...</div>
+    <form id="viewStudentForm" style="display: none;">
+      <input type="hidden" id="studentId" />
+      <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" readonly />
+      </div>
+      <div>
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" readonly />
+      </div>
+      <button type="submit">Update Student</button>
+    </form>
+
+    <div id="message"></div>
+
+    <script src="view-script.js"></script>
+  </body>
+</html>
