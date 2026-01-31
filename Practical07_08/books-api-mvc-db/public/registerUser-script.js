@@ -1,32 +1,34 @@
 // Get references to the form and message elements:
-const createBookForm = document.getElementById("createBookForm");
+const registerUserForm = document.getElementById("registerUserForm");
 const messageDiv = document.getElementById("message");
 const apiBaseUrl = "http://localhost:3000";
 
-createBookForm.addEventListener("submit", async (event) => {
+registerUserForm.addEventListener("submit", async (event) => {
   event.preventDefault(); // Prevent the default browser form submission
 
   messageDiv.textContent = ""; // Clear previous messages
 
   // Collect data from the form inputs
-  const titleInput = document.getElementById("title");
-  const authorInput = document.getElementById("author");
+  const userNameInput = document.getElementById("userName");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const roleInput = document.getElementById("role");
 
-  const newBookData = {
-    title: titleInput.value,
-    author: authorInput.value,
+  const newUserData = {
+    username: userNameInput.value,
+    email: emailInput.value,
+    password: passwordInput.value,
+    role: roleInput.value,
   };
 
   try {
     // Make a POST request to your API endpoint
-    const token = localStorage.getItem("jwtToken");
-    const response = await fetch(`${apiBaseUrl}/books`, {
+    const response = await fetch(`${apiBaseUrl}/register`, {
       method: "POST", // Specify the HTTP method
       headers: {
-        "Content-Type": "application/json",
-        ...(token && { "Authorization": `Bearer ${token}` }) // Add header if token exists
+        "Content-Type": "application/json", // Tell the API we are sending JSON
       },
-      body: JSON.stringify(newBookData), // Send the data as a JSON string in the request body
+      body: JSON.stringify(newUserData), // Send the data as a JSON string in the request body
     });
 
     // Check for API response status (e.g., 201 Created, 400 Bad Request, 500 Internal Server Error)
@@ -34,16 +36,17 @@ createBookForm.addEventListener("submit", async (event) => {
       .get("content-type")
       ?.includes("application/json")
       ? await response.json()
-      : { message: response.statusText, error: response.error };
+      : { message: response.statusText };
 
     if (response.status === 201) {
-      messageDiv.textContent = `Book created successfully! ID: ${responseBody.id}`;
+      const userId = responseBody.data && responseBody.data.id;
+      messageDiv.textContent = `User registered successfully! ID: ${userId}`;
       messageDiv.style.color = "green";
-      createBookForm.reset(); // Clear the form after success
-      console.log("Created Book:", responseBody);
+      registerUserForm.reset(); // Clear the form after success
+      console.log("Registered user:", responseBody);
     } else if (response.status === 400) {
       // Handle validation errors from the API (from Practical 04 validation middleware)
-      messageDiv.textContent = `Validation Error: ${responseBody.error}`;
+      messageDiv.textContent = `Validation Error: ${responseBody.error||responseBody.message}`;
       messageDiv.style.color = "red";
       console.error("Validation Error:", responseBody);
     } else {
@@ -53,8 +56,8 @@ createBookForm.addEventListener("submit", async (event) => {
       );
     }
   } catch (error) {
-    console.error("Error creating book:", error);
-    messageDiv.textContent = `Failed to create book: ${error.message}`;
+    console.error("Error registering user:", error);
+    messageDiv.textContent = `Failed to register user: ${error.message}`;
     messageDiv.style.color = "red";
   }
 });

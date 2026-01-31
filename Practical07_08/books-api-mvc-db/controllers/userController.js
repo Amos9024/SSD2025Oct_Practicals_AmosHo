@@ -1,6 +1,5 @@
-const { user } = require("../dbConfig");
-const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const User = require("../models/userModel");
 
 // Get all users
 async function getAllUsers(req, res) {
@@ -30,22 +29,32 @@ async function getUserById(req, res) {
 }
 
 // Create new user
-/* async function createUser(req, res) {
-  try {
-    const newUser = await User.createUser(req.body);
-    res.status(201).json(newUser);
-  } catch (error) {
-    console.error("Controller error:", error);
-    res.status(500).json({ error: "Error creating user" });
-  }
-} */
-
 async function registerUser(req, res) {
-  const { username, password, email, role } = req.body;
+  const { username, email, password, role } = req.body;
 
   try {
-    // Validate user data
-    // ... Implement your validation logic here or better yet write a middleware function for your validation...
+    // Validate user data 
+    // Use middleware for validation - see app.js and userValidation.js
+  //  // ... Implement your validation logic here or better yet write a middleware function for your validation...
+  //   if (!username || username.trim() === "") {
+  //     return res.status(400).send("Username is required");  
+  // ``}
+
+  //   if (!email || email.trim() === "") {
+  //     return res.status(400).send("Email address is required");  
+  // ``}
+  // ``
+  //   if (!password || password.trim() === "") {
+  //     return res.status(400).send("Password is required");  
+  // ``} else if (password.length < 8) {
+  //     return res.status(400).send("Password must be at least 8 characters long");
+  // ``}
+
+  //   if (!role || role.trim() === "") {
+  //     return res.status(400).send("Role is required");  
+  //   } else if (!["member", "librarian"].includes(role.toLowerCase())) {
+  //     return res.status(400).send("Invalid role. Valid roles: member, librarian"); 
+  //   }
 
     // Check for existing username
     const existingUser = await User.getUserByUsername(username);
@@ -58,7 +67,6 @@ async function registerUser(req, res) {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create user in database
-    // ... your database logic here ...
     const userData = {
       username: username,
       email: email,
@@ -66,8 +74,9 @@ async function registerUser(req, res) {
       role: role,
     };
     const newUser = await User.createUser(userData);
-
-    return res.status(201).json({ message: "User created successfully", data: newUser });
+    return res.status(201).json({ message: "User created successfully", 
+                                  data: newUser,
+                                });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -139,10 +148,9 @@ async function getUsersWithBooks(req, res) {
 module.exports = {
   getAllUsers,
   getUserById,
-  //createUser,
+  registerUser,
   updateUser,
   deleteUser,
   searchUsers,
   getUsersWithBooks,
-  registerUser,
 };

@@ -19,7 +19,14 @@ function getBookIdFromUrl() {
 async function fetchBookData(bookId) {
   try {
     // Make a GET request to the API endpoint for a specific book
-    const response = await fetch(`${apiBaseUrl}/books/${bookId}`);
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(`${apiBaseUrl}/books/${bookId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }) // Add header if token exists
+      },
+    });
 
     // Check if the HTTP response status is not OK (e.g., 404, 500)
     if (!response.ok) {
@@ -70,12 +77,13 @@ if (bookIdToEdit) {
     if (book) {
       // If book data was successfully fetched, populate the form
       populateForm(book);
-    } else {
-      // Handle the case where fetchBookData returned null (book not found or error)
-      loadingMessageDiv.textContent = "Book not found or failed to load.";
-      messageDiv.textContent = "Could not find the book to edit.";
-      messageDiv.style.color = "red";
-    }
+    } 
+    // else {
+    //   // Handle the case where fetchBookData returned null (book not found or error)
+    //   loadingMessageDiv.textContent = "Book not found or failed to load.";
+    //   messageDiv.textContent = "Could not find the book to edit.";
+    //   messageDiv.style.color = "red";
+    // }
   });
 } else {
   // Handle the case where no book ID was provided in the URL
@@ -104,7 +112,9 @@ editBookForm.addEventListener("submit", async (event) => {
   bookId = document.getElementById("bookId").value;
 
   try {
-    // TODO: Implement the fetch PUT request to the API endpoint /books/:id
+    // TODO: Implement the fetch PUT request to the API endpoint /
+    const token = localStorage.getItem("jwtToken");
+   
     const response = await fetch(`${apiBaseUrl}/books/${bookId}`, {
         method: "PUT", // Specify the HTTP method
         // TODO: Include the updated data in the request body (as JSON string)
@@ -112,6 +122,7 @@ editBookForm.addEventListener("submit", async (event) => {
         // TODO: Set the 'Content-Type': 'application/json' header
         headers: {
             "Content-Type": "application/json", // Tell the API we are sending JSON
+                    ...(token && { "Authorization": `Bearer ${token}` }) // Add header if token exists
         },
       });
 

@@ -1,7 +1,7 @@
 const sql = require("mssql");
 const dbConfig = require("../dbConfig");
 
-// Get all userss
+// Get all users
 async function getAllUsers() {
   let connection;
   try {
@@ -23,12 +23,12 @@ async function getAllUsers() {
   }
 }
 
-// Get book by ID
+// Get user by ID
 async function getUserById(id) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query = "SELECT id, username, email FROM Users WHERE id = @id";
+    const query = "SELECT * FROM Users WHERE id = @id";
     const request = connection.request();
     request.input("id", id);
     const result = await request.query(query);
@@ -51,6 +51,36 @@ async function getUserById(id) {
     }
   }
 }
+
+// Get user by name
+async function getUserByUsername(username) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query = "SELECT * FROM Users WHERE username = @username";
+    const request = connection.request();
+    request.input("username", username);
+    const result = await request.query(query);
+
+    if (result.recordset.length === 0) {
+      return null; // User not found
+    }
+
+    return result.recordset[0];
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 
 // Create new user
 async function createUser(userData) {
@@ -256,41 +286,13 @@ async function getUsersWithBooks() {
   }
 }
 
-async function getUserByUsername(username) {
-  let connection;
-  try {
-    connection = await sql.connect(dbConfig);
-    const query = "SELECT * FROM Users WHERE username = @username";
-    const request = connection.request();
-    request.input("username", username);
-    const result = await request.query(query);
-
-    if (result.recordset.length === 0) {
-      return null; // User not found
-    }
-
-    return result.recordset[0];
-  } catch (error) {
-    console.error("Database error:", error);
-    throw error;
-  } finally {
-    if (connection) {
-      try {
-        await connection.close();
-      } catch (err) {
-        console.error("Error closing connection:", err);
-      }
-    }
-  }
-}
-
 module.exports = {
   getAllUsers,
   getUserById,
+  getUserByUsername,
   createUser,
   updateUser,
   deleteUser,
   searchUsers,
   getUsersWithBooks,
-  getUserByUsername
 };

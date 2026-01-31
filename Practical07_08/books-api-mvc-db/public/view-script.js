@@ -5,6 +5,7 @@ const messageDiv = document.getElementById("message"); // Element to display mes
 const bookIdInput = document.getElementById("bookId"); // Hidden input to store the book ID
 const titleInput = document.getElementById("title"); // Input for the book title
 const authorInput = document.getElementById("author"); // Input for the book author
+const availabilityInput = document.getElementById("availability"); // Input for the book availability
 
 // Base URL for the API.
 const apiBaseUrl = "http://localhost:3000";
@@ -19,8 +20,15 @@ function getBookIdFromUrl() {
 async function fetchBookData(bookId) {
   try {
     // Make a GET request to the API endpoint for a specific book
-    const response = await fetch(`${apiBaseUrl}/books/${bookId}`);
-
+    const token = localStorage.getItem("jwtToken");
+    const response = await fetch(`${apiBaseUrl}/books/${bookId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }) // Add header if token exists
+      },
+    });
+    
     // Check if the HTTP response status is not OK (e.g., 404, 500)
     if (!response.ok) {
       // Attempt to read error body if available (assuming JSON), otherwise use status text
@@ -54,6 +62,7 @@ function populateForm(book) {
   bookIdInput.value = book.id; // Store the book ID in the hidden input
   titleInput.value = book.title; // Set the title input value
   authorInput.value = book.author; // Set the author input value
+  availabilityInput.value = book.availability; // Set the availability input value
   loadingMessageDiv.style.display = "none"; // Hide the loading message
   viewBookForm.style.display = "block"; // Show the view form
 }
@@ -70,12 +79,13 @@ if (bookIdToView) {
     if (book) {
       // If book data was successfully fetched, populate the form
       populateForm(book);
-    } else {
-      // Handle the case where fetchBookData returned null (book not found or error)
-      loadingMessageDiv.textContent = "Book not found or failed to load.";
-      messageDiv.textContent = "Could not find the book to edit.";
-      messageDiv.style.color = "red";
-    }
+    } 
+    // else {
+    //   // Handle the case where fetchBookData returned null (book not found or error)
+    //   loadingMessageDiv.textContent = "Book not found or failed to load.";
+    //   messageDiv.textContent = "Could not find the book to edit.";
+    //   messageDiv.style.color = "red";
+    // }
   });
 } else {
   // Handle the case where no book ID was provided in the URL

@@ -5,35 +5,54 @@ const dotenv = require("dotenv");
 // Load environment variables
 dotenv.config();
 
-const userController = require("./controllers/userController"); // Note: Changed to userController for consistency
-const bookController = require("./controllers/bookController");
-const {
-  validateBook,
-  validateBookId,
-} = require("./middlewares/bookValidation"); // import Book Validation Middleware
-
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
-
-// Middleware
-app.use(express.json()); // Parse JSON request bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
 
 // --- Serve static files from the 'public' directory ---
 // When a request comes in for a static file (like /index.html, /styles.css, /script.js),
 // Express will look for it in the 'public' folder relative to the project root.
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes for books
+// Middleware
+app.use(express.json()); // Parse JSON request bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
+
+// import Book Validation Middleware
+const {
+  validateBook,
+  validateBookId,
+} = require("./middlewares/bookValidation"); 
+
+// Import User Validation Middleware
+const {
+  validateUser,
+  validateUserId,
+  validatePassword,
+  validateRole,
+} = require("./middlewares/userValidation"); 
+
+// Import User Authorization Middleware
+const authorizeUser = require("./middlewares/authorizeUser");
+
+// Import Controllers
+const authController = require("./controllers/authController");
+const userController = require("./controllers/userController"); // Note: Changed to userController for consistency
+const bookController = require("./controllers/bookController");
+
 // Link specific URL paths to the corresponding controller functions
-app.get("/books", bookController.getAllBooks);
-app.get("/books/:id", validateBookId, bookController.getBookById);
-app.post("/books", validateBook, bookController.createBook);
-app.put("/books/:id", validateBookId, validateBook, bookController.updateBook);
-app.delete("/books/:id", validateBookId, bookController.deleteBook);
+
+// Routes for books
+app.get("/books", authorizeUser, bookController.getAllBooks);
+app.get("/books/:id", authorizeUser, validateBookId, bookController.getBookById);
+//app.get("/books/:id", validateBookId, bookController.getBookById);
+app.post("/books", authorizeUser, validateBook, bookController.createBook);
+app.put("/books/:bookId/availability", authorizeUser, bookController.updateBookAvailability);
+app.put("/books/:id", authorizeUser, validateBookId, validateBook, bookController.updateBook);
+app.delete("/books/:id", authorizeUser, validateBookId, bookController.deleteBook);
+
 // Routes for users
-app.post("/register", userController.registerUser); // Register user
+app.post("/register", validateUser, validatePassword, validateRole, userController.registerUser); // Create user
 app.get("/users", userController.getAllUsers); // Get all users
 // Order is important: place search route before getUserById
 app.get("/users/search", userController.searchUsers); // Search users
@@ -42,6 +61,8 @@ app.get("/users/:id", userController.getUserById); // Get user by ID
 app.put("/users/:id", userController.updateUser); // Update user
 app.delete("/users/:id", userController.deleteUser); // Delete user
 
+// Routes for Authentication controller
+app.post("/login", authController.login); // Login user
 
 // Start server
 app.listen(port, () => {

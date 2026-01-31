@@ -48,7 +48,10 @@
 
     <div id="loadingMessage">Loading book data...</div>
     <form id="viewBookForm" style="display: none;">
-      <input type="hidden" id="bookId" />
+      <div>
+        <label for="bookId">Book ID:</label>
+        <input type="text" id="bookId" name="bookId" readonly />
+      </div>
       <div>
         <label for="title">Title:</label>
         <input type="text" id="title" name="title" readonly />
@@ -56,6 +59,10 @@
       <div>
         <label for="author">Author:</label>
         <input type="text" id="author" name="author" readonly />
+      </div>
+      <div>
+        <label for="availability">Availability:</label>
+        <input type="text" id="availability" name="availability" readonly />
       </div>
       <button type="submit">Update Book</button>
     </form>

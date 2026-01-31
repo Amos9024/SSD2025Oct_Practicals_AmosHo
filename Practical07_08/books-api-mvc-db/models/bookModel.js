@@ -6,7 +6,7 @@ async function getAllBooks() {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query = "SELECT id, title, author FROM Books";
+    const query = "SELECT id, title, author, availability FROM Books";
     const result = await connection.request().query(query);
     return result.recordset;
   } catch (error) {
@@ -28,7 +28,7 @@ async function getBookById(id) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query = "SELECT id, title, author FROM Books WHERE id = @id";
+    const query = "SELECT id, title, author, availability FROM Books WHERE id = @id";
     const request = connection.request();
     request.input("id", id);
     const result = await request.query(query);
@@ -58,10 +58,11 @@ async function createBook(bookData) {
   try {
     connection = await sql.connect(dbConfig);
     const query =
-      "INSERT INTO Books (title, author) VALUES (@title, @author); SELECT SCOPE_IDENTITY() AS id;";
+      "INSERT INTO Books (title, author, availability) VALUES (@title, @author, @availability); SELECT SCOPE_IDENTITY() AS id;";
     const request = connection.request();
     request.input("title", bookData.title);
     request.input("author", bookData.author);
+    request.input("availability", bookData.availability);
     const result = await request.query(query);
 
     const newBookId = result.recordset[0].id;
@@ -107,6 +108,32 @@ async function updateBook(id, bookData) {
   }
 }
 
+// Update book availability
+async function updateBookAvailability (id, bookData) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query =
+        "UPDATE Books SET availability = @availability WHERE id = @id";
+    const request = connection.request();
+    request.input("id", id);
+    request.input("availability", bookData.availability);
+    result = await request.query(query);
+    return result.rowsAffected > 0; // Indicate success based on affected rows
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
+
 // Delete an existing book
 async function deleteBook(id) {
   let connection;
@@ -137,5 +164,6 @@ module.exports = {
   getBookById,
   createBook,
   updateBook,
+  updateBookAvailability,
   deleteBook,
 };
