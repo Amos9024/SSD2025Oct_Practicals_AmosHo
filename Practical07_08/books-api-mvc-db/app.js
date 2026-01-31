@@ -1,3 +1,6 @@
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger-output.json"); // Import generated spec
+
 const path = require("path");
 const express = require("express");
 const sql = require("mssql");
@@ -8,7 +11,7 @@ dotenv.config();
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // --- Serve static files from the 'public' directory ---
 // When a request comes in for a static file (like /index.html, /styles.css, /script.js),
 // Express will look for it in the 'public' folder relative to the project root.

@@ -7,10 +7,11 @@ async function getAllBooks(req, res) {
     console.log("User from request:", user);
     const books = await bookModel.getAllBooks();
     //res.json(books);
-    res.json({ user, books }); // Return both user and books
+    res.status(200).json(books); // Return both user and books
   } catch (error) {
-    console.error("Controller error:", error);
-    res.status(500).json({ error: "Error retrieving books" });
+    //console.error("Controller error:", error);
+    //res.status(500).json({ error: "Error retrieving books" });
+    res.status(500).send("Error retrieving books");
   }
 }
 
