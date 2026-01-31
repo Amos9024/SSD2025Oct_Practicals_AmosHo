@@ -85,7 +85,7 @@ async function updateBookAvailability(req, res) {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error updating book");
+    res.status(500).json({ error: "Error updating book availability" });
   }
 };
 
