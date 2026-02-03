@@ -56,7 +56,7 @@ async function createBin(binData) {
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const query = "INSERT INTO Bins (BinID, LocationID, currentCapacity, MaxCapacity, Country, BinStatus) VALUES (@BinID, @locationId, @currentCapacity, @maxCapacity, @country, @binStatus); SELECT SCOPE_IDENTITY() AS BinID;";
+        const query = "INSERT INTO Bins (LocationID, currentCapacity, MaxCapacity, Country, BinStatus) VALUES (@locationId, @currentCapacity, @maxCapacity, @country, @binStatus); SELECT SCOPE_IDENTITY() AS BinID;";
         const request = connection.request();
         request.input("BinID", binData.BinID);          
         request.input("locationId", binData.LocationID);
@@ -137,6 +137,31 @@ async function deleteBin(id) {
   }
 }
 
+// Update bin availability
+async function updateBinAvailability (id, binStatus) {
+  let connection;
+  try {
+    connection = await sql.connect(dbConfig);
+    const query =
+        "UPDATE Bins SET BinStatus = @binStatus WHERE BinID = @id";
+    const request = connection.request();
+    request.input("id", id);
+    request.input("binStatus", binStatus);
+    result = await request.query(query);
+    return result.rowsAffected > 0; // Indicate success based on affected rows
+  } catch (error) {
+    console.error("Database error:", error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error("Error closing connection:", err);
+      }
+    }
+  }
+}
 
 // in JavaScript, in order to access the functions we have to export them. 
 module.exports = {
@@ -145,4 +170,5 @@ module.exports = {
   createBin,
   updateBin,
   deleteBin,
+  updateBinAvailability,
 };

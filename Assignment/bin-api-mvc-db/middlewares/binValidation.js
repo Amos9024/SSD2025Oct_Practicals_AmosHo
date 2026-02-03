@@ -2,12 +2,12 @@ const Joi = require("joi"); // Import Joi for validation
 
 // Validation schema for bins (used for POST/PUT)
 const binSchema = Joi.object({
-  BinID: Joi.number().integer().min(1).required().messages({
+  /* BinID: Joi.number().integer().min(1).required().messages({
     "number.base": "BinID must be a number",
     "number.integer": "BinID must be an integer",
     "number.min": "BinID must be greater than 0",
     "any.required": "BinID is required",
-  }),
+  }), */
 
   LocationID: Joi.string().min(1).max(50).required().messages({
     "string.base": "LocationID must be a string",

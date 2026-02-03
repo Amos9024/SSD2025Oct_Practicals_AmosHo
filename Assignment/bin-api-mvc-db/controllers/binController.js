@@ -67,6 +67,34 @@ async function deleteBin(req, res) {
     res.status(500).json({ error: "Error deleting bin" });
   }
 }
+
+// Update bin availability
+async function updateBinAvailability(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    console.log("Updating availability for bin ID:", id);
+    const success = await binModel.updateBinAvailability(id, req.body);
+    if (!success) {
+      return res.status(404).json({ error: "Bin not found" });
+    }
+    const updatedBin = await binModel.getBinById(id);
+    res.json({
+        message: `Bin with id ${id} updated successfully.`,
+        bin: updatedBin,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error updating bin availability" });
+  }
+};
+
+
+
+
+
+
+
+
 module.exports = {
   getAllBins,
   getBinById,
