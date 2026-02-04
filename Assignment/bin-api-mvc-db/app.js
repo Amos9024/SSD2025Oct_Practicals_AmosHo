@@ -7,14 +7,17 @@ const dotenv = require("dotenv");
 // Load environment variables
 dotenv.config();
 
-const binController = require("./controllers/binController");
-const { validateBin, validateBinId,} = require("./middlewares/binValidation"); // import Bin Validation Middleware
 
-const userController = require("./controllers/userController");
+const { validateBin, validateBinId,} = require("./middlewares/binValidation"); // import Bin Validation Middleware
 // Import User Validation Middleware
 const {validateUser, validateUserId, validatePassword, validateStatus,validateDateJoined} = require("./middlewares/userValidation"); 
+const authorizeUser = require("./middlewares/authorizeUser");
 
+const binController = require("./controllers/binController");
+const userController = require("./controllers/userController");
 const reqcontroller = require("./controllers/reqController");
+const authController = require("./controllers/authController");
+
 
 // Create Express app
 const app = express();
@@ -25,12 +28,12 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
 
-app.get("/bins", binController.getAllBins);
-app.get("/bins/:id", validateBinId, binController.getBinById);
-app.post("/bins", validateBin, binController.createBin); 
-app.put("/bins/:id/availability", validateBinId, binController.updateBinAvailability);
-app.put("/bins/:id", validateBin, validateBinId, binController.updateBin);
-app.delete("/bins/:id", validateBinId, binController.deleteBin);
+app.get("/bins", authorizeUser, binController.getAllBins);
+app.get("/bins/:id", authorizeUser, validateBinId, binController.getBinById);
+app.post("/bins", authorizeUser, validateBin, binController.createBin); 
+app.put("/bins/:id/availability", authorizeUser, validateBinId, binController.updateBinAvailability);
+app.put("/bins/:id", authorizeUser, validateBin, validateBinId, binController.updateBin);
+app.delete("/bins/:id", authorizeUser, validateBinId, binController.deleteBin);
 
 // Routes for users
 app.post("/register", validateUser, validateStatus, validateDateJoined, validatePassword, userController.registerUser); // Create user
@@ -46,6 +49,9 @@ app.get("/requests/:id", reqcontroller.getRequestById);
 app.post("/requests", reqcontroller.createRequest);
 app.put("/requests/:id", reqcontroller.updateRequest);
 app.delete("/requests/:id", reqcontroller.deleteRequest);
+
+
+app.post("/login", authController.login);
 
 // Start server
 app.listen(port, () => {

@@ -13,16 +13,17 @@ async function login(req, res) {
     }
 
     // Compare password with hash
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    const isMatch = await bcrypt.compare(password, user.PasswordHash);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     // Generate JWT token
     const payload = {
-      id: user.id,
-      role: user.role,
+      id: user.UserID,
+      status: user.Status,
     };
+
     const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, 
                            { expiresIn: "3600s" }); // Expires in 1 hour
 
