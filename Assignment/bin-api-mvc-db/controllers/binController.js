@@ -88,17 +88,11 @@ async function updateBinAvailability(req, res) {
   }
 };
 
-
-
-
-
-
-
-
 module.exports = {
   getAllBins,
   getBinById,
   createBin,
   updateBin,
   deleteBin,
+  updateBinAvailability,
 };

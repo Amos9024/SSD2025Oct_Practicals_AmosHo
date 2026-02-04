@@ -14,6 +14,8 @@ const userController = require("./controllers/userController");
 // Import User Validation Middleware
 const {validateUser, validateUserId, validatePassword, validateStatus,validateDateJoined} = require("./middlewares/userValidation"); 
 
+const reqcontroller = require("./controllers/reqController");
+
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -39,7 +41,11 @@ app.get("/users/:id",validateUserId,userController.getUserById); // Get user by 
 app.put("/users/:id",validateUserId,  userController.updateUser); // Update user
 app.delete("/users/:id", validateUserId,userController.deleteUser); // Delete user
 
-
+app.get("/requests", reqcontroller.getAllRequests);
+app.get("/requests/:id", reqcontroller.getRequestById);
+app.post("/requests", reqcontroller.createRequest);
+app.put("/requests/:id", reqcontroller.updateRequest);
+app.delete("/requests/:id", reqcontroller.deleteRequest);
 
 // Start server
 app.listen(port, () => {
