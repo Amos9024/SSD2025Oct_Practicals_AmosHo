@@ -56,18 +56,24 @@ async function createRequest(requestData) {
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const query = "INSERT INTO DisposalRequest (BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight) VALUES (@binId, @userId, @dateDisposed, @serialNumber, @modelName, @brand, @weight); SELECT SCOPE_IDENTITY() AS DisposalID;";
-        const request = connection.request();
-        request.input("BinID", requestData.BinID);          
-        request.input("UserID", requestData.UserID);
-        request.input("DateDisposed", requestData.DateDisposed);
-        request.input("SerialNumber", requestData.SerialNumber);
-        request.input("ModelName", requestData.ModelName);
-        request.input("Brand", requestData.Brand);
-        request.input("Weight", requestData.Weight);
-        const result = await request.query(query);
+        const insertQuery = "INSERT INTO DisposalRequest (BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight) VALUES (@binId, @userId, @dateDisposed, @serialNumber, @modelName, @brand, @weight); SELECT SCOPE_IDENTITY() AS DisposalID;";
+        const insertRequest = connection.request();
+        insertRequest.input("BinID", requestData.BinID);          
+        insertRequest.input("UserID", requestData.UserID);
+        insertRequest.input("DateDisposed", requestData.DateDisposed);
+        insertRequest.input("SerialNumber", requestData.SerialNumber);
+        insertRequest.input("ModelName", requestData.ModelName);
+        insertRequest.input("Brand", requestData.Brand);
+        insertRequest.input("Weight", requestData.Weight);
+        const insertResult = await insertRequest.query(insertQuery);
 
-        return result.recordset[0];
+        const updateQuery = "UPDATE Bins SET currentCapacity = currentCapacity + @weight WHERE BinID = @id; SELECT * FROM Bins WHERE BinID = @id;";
+        const updateRequest = connection.request();
+        updateRequest.input("id", requestData.BinID);
+        updateRequest.input("weight", requestData.Weight);
+        const updateResult = await updateRequest.query(updateQuery);
+
+        return updateResult.recordset[0];
     } catch (error) {
         console.error("Database error:", error);
         throw error;
@@ -120,12 +126,25 @@ async function deleteRequest(id) {
   let connection;
   try {
     connection = await sql.connect(dbConfig);
-    const query =
+    const selectQuery = 
+      "SELECT BinID, weight FROM DisposalRequest WHERE DisposalID = @id";
+    const selectRequest = connection.request();
+    selectRequest.input("id", id);
+    const selectResult = await selectRequest.query(selectQuery);
+    const deleteQuery =
       "DELETE FROM DisposalRequest WHERE DisposalID = @id;";
-    const request = connection.request();
-    request.input("id", id);
-    const result = await request.query(query);
-    return result.rowsAffected[0];
+    const deleteRequest = connection.request();
+    deleteRequest.input("id", id);
+    const deleteResult = await deleteRequest.query(deleteQuery);
+    
+    const { BinID, weight } = selectResult.recordset[0];
+    const updateQuery = "UPDATE Bins SET currentCapacity = currentCapacity - @weight WHERE BinID = @id; SELECT * FROM Bins WHERE BinID = @id;";
+    const updateRequest = connection.request();
+    updateRequest.input("id", BinID);
+    updateRequest.input("weight", weight);
+    const updateResult = await updateRequest.query(updateQuery);
+
+    return updateResult.recordset[0];
   } catch (error) {
     console.error("Database error:", error);
     throw error;
