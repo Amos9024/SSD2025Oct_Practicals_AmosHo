@@ -118,11 +118,11 @@ async function deleteBin(id) {
   try {
     connection = await sql.connect(dbConfig);
     const query =
-      "DELETE FROM Bins WHERE BinID = @id;";
+      "UPDATE Bins SET BinStatus = 'N' WHERE BinID = @id;";
     const request = connection.request();
     request.input("id", id);
     const result = await request.query(query);
-    return result.rowsAffected[0];
+    return { rowsAffected: result.rowsAffected[0], recordset: result.recordset[0] };
   } catch (error) {
     console.error("Database error:", error);
     throw error;

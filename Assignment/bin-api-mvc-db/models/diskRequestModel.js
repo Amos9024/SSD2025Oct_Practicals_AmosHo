@@ -6,7 +6,7 @@ async function getAllRequests() {
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const query = "SELECT DisposalID, BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight FROM DisposalRequest";
+        const query = "SELECT DisposalID, BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight, isDeleted FROM DisposalRequest";
         const result = await connection.request().query(query);
         return result.recordset;
     }catch (error) {
@@ -27,7 +27,7 @@ async function getRequestById(id) {
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const query = "SELECT DisposalID, BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight FROM DisposalRequest WHERE DisposalID = @id";
+        const query = "SELECT DisposalID, BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight, isDeleted FROM DisposalRequest WHERE DisposalID = @id";
         const request = connection.request();
         request.input("id", id);
         const result = await request.query(query);
@@ -56,15 +56,28 @@ async function createRequest(requestData) {
     let connection;
     try {
         connection = await sql.connect(dbConfig);
-        const insertQuery = "INSERT INTO DisposalRequest (BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight) VALUES (@binId, @userId, @dateDisposed, @serialNumber, @modelName, @brand, @weight); SELECT SCOPE_IDENTITY() AS DisposalID;";
+        const capacityQuery = "SELECT currentCapacity, maxCapacity FROM Bins WHERE BinID = @id;";
+        const capacityRequest = connection.request();
+        capacityRequest.input("id", requestData.BinID);
+        const capacityResult = await capacityRequest.query(capacityQuery);
+        
+        const { currentCapacity, maxCapacity } = capacityResult.recordset[0];
+        if (currentCapacity + requestData.Weight > maxCapacity) {
+            throw new Error(
+                `Insufficient capacity. Remaining: ${maxCapacity - currentCapacity}`
+            );
+        }
+
+        const insertQuery = "INSERT INTO DisposalRequest (BinID, UserID, DateDisposed, SerialNumber, ModelName, Brand, Weight, isDeleted) VALUES (@id, @userId, @dateDisposed, @serialNumber, @modelName, @brand, @weight, @isDeleted); SELECT SCOPE_IDENTITY() AS DisposalID;";
         const insertRequest = connection.request();
-        insertRequest.input("BinID", requestData.BinID);          
-        insertRequest.input("UserID", requestData.UserID);
-        insertRequest.input("DateDisposed", requestData.DateDisposed);
-        insertRequest.input("SerialNumber", requestData.SerialNumber);
-        insertRequest.input("ModelName", requestData.ModelName);
-        insertRequest.input("Brand", requestData.Brand);
-        insertRequest.input("Weight", requestData.Weight);
+        insertRequest.input("id", requestData.BinID);          
+        insertRequest.input("userId", requestData.UserID);
+        insertRequest.input("dateDisposed", requestData.DateDisposed);
+        insertRequest.input("serialNumber", requestData.SerialNumber);
+        insertRequest.input("modelName", requestData.ModelName);
+        insertRequest.input("brand", requestData.Brand);
+        insertRequest.input("weight", requestData.Weight);
+        insertRequest.input("isDeleted", requestData.isDeleted);
         const insertResult = await insertRequest.query(insertQuery);
 
         const updateQuery = "UPDATE Bins SET currentCapacity = currentCapacity + @weight WHERE BinID = @id; SELECT * FROM Bins WHERE BinID = @id;";
@@ -94,16 +107,17 @@ async function updateRequest(id, requestData) {
   try {
     connection = await sql.connect(dbConfig);
     const query =
-      "UPDATE DisposalRequest SET BinID = @binId, UserID = @userId, DateDisposed = @dateDisposed, SerialNumber = @serialNumber, ModelName = @modelName, Brand = @brand, Weight = @weight WHERE DisposalID = @id; SELECT * FROM DisposalRequest WHERE DisposalID = @id;";
+      // "UPDATE DisposalRequest SET BinID = @binId, UserID = @userId, DateDisposed = @dateDisposed, SerialNumber = @serialNumber, ModelName = @modelName, Brand = @brand, Weight = @weight WHERE DisposalID = @id; SELECT * FROM DisposalRequest WHERE DisposalID = @id;";
+        "UPDATE DisposalRequest SET UserID = @userId, DateDisposed = @dateDisposed, SerialNumber = @serialNumber, ModelName = @modelName, Brand = @brand WHERE DisposalID = @id; SELECT * FROM DisposalRequest WHERE DisposalID = @id;";
     const request = connection.request();
     request.input("id", id);
-    request.input("binId", requestData.BinID);
+    // request.input("binId", requestData.BinID);
     request.input("userId", requestData.UserID);
     request.input("dateDisposed", requestData.DateDisposed);
     request.input("serialNumber", requestData.SerialNumber);
     request.input("modelName", requestData.ModelName);
     request.input("brand", requestData.Brand);
-    request.input("weight", requestData.Weight);
+    // request.input("weight", requestData.Weight);
     const result = await request.query(query);
     return result.rowsAffected[0];
 
@@ -127,17 +141,19 @@ async function deleteRequest(id) {
   try {
     connection = await sql.connect(dbConfig);
     const selectQuery = 
-      "SELECT BinID, weight FROM DisposalRequest WHERE DisposalID = @id";
+      "SELECT BinID, Weight FROM DisposalRequest WHERE DisposalID = @id";
     const selectRequest = connection.request();
     selectRequest.input("id", id);
     const selectResult = await selectRequest.query(selectQuery);
+    const BinID = selectResult.recordset[0].BinID;
+    const weight = selectResult.recordset[0].Weight;
     const deleteQuery =
-      "DELETE FROM DisposalRequest WHERE DisposalID = @id;";
+      "UPDATE DisposalRequest SET isDeleted = 1 WHERE DisposalID = @id;";
     const deleteRequest = connection.request();
     deleteRequest.input("id", id);
     const deleteResult = await deleteRequest.query(deleteQuery);
     
-    const { BinID, weight } = selectResult.recordset[0];
+
     const updateQuery = "UPDATE Bins SET currentCapacity = currentCapacity - @weight WHERE BinID = @id; SELECT * FROM Bins WHERE BinID = @id;";
     const updateRequest = connection.request();
     updateRequest.input("id", BinID);

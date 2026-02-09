@@ -12,7 +12,7 @@ const { validateBin, validateBinId,} = require("./middlewares/binValidation"); /
 // Import User Validation Middleware
 const {validateUser, validateUserId, validatePassword, validateStatus,validateDateJoined} = require("./middlewares/userValidation"); 
 const authorizeUser = require("./middlewares/authorizeUser");
-
+const {validateRequest, validateRequestId} = require("./middlewares/reqValidation");
 const binController = require("./controllers/binController");
 const userController = require("./controllers/userController");
 const reqcontroller = require("./controllers/reqController");
@@ -45,10 +45,10 @@ app.put("/users/:id",validateUserId,  userController.updateUser); // Update user
 app.delete("/users/:id", validateUserId,userController.deleteUser); // Delete user
 
 app.get("/requests", reqcontroller.getAllRequests);
-app.get("/requests/:id", reqcontroller.getRequestById);
-app.post("/requests", reqcontroller.createRequest);
-app.put("/requests/:id", reqcontroller.updateRequest);
-app.delete("/requests/:id", reqcontroller.deleteRequest);
+app.get("/requests/:id",validateRequestId, reqcontroller.getRequestById);
+app.post("/requests", validateRequest, reqcontroller.createRequest);
+app.put("/requests/:id", validateRequestId,reqcontroller.updateRequest);
+app.delete("/requests/:id", validateRequestId, reqcontroller.deleteRequest);
 
 
 app.post("/login", authController.login);

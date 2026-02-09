@@ -18,7 +18,7 @@ const requestSchema = Joi.object({
     "any.required": "SerialNumber is required",
   }),
 
-  ModelName: Joi.string().min(1).max(50).required.messages({
+  ModelName: Joi.string().min(1).max(50).required().messages({
     "string.base": "ModelName must be a string",
     "string.min": "ModelName must be at least 1 character",
     "string.max": "ModelName cannot exceed 50 characters",
@@ -55,7 +55,7 @@ function validateRequestId(req, res, next) {
     // If not valid, send a 400 response
     return res
       .status(400)
-      .json({ error: "Invalid bin ID. ID must be a positive number" });
+      .json({ error: "Invalid disposal request ID. ID must be a positive number" });
   }
 
   // If validation succeeds, pass control to the next middleware/route handler
