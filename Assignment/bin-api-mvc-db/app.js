@@ -10,7 +10,7 @@ dotenv.config();
 
 const { validateBin, validateBinId,} = require("./middlewares/binValidation"); // import Bin Validation Middleware
 // Import User Validation Middleware
-const {validateUser, validateUserId, validatePassword, validateStatus,validateDateJoined} = require("./middlewares/userValidation"); 
+const {validateUser, validateUserId, validatePassword, validateRole,validateDateJoined} = require("./middlewares/userValidation"); 
 const authorizeUser = require("./middlewares/authorizeUser");
 const {validateRequest, validateRequestId} = require("./middlewares/reqValidation");
 const binController = require("./controllers/binController");
@@ -36,7 +36,7 @@ app.put("/bins/:id", authorizeUser, validateBin, validateBinId, binController.up
 app.delete("/bins/:id", authorizeUser, validateBinId, binController.deleteBin);
 
 // Routes for users
-app.post("/register", validateUser, validateStatus, validateDateJoined, validatePassword, userController.registerUser); // Create user
+app.post("/register", validateUser, validateRole, validateDateJoined, validatePassword, userController.registerUser); // Create user
 app.get("/users", userController.getAllUsers); // Get all users
 // Order is important: place search route before getUserById
 app.get("/users/search", userController.searchUsers); // Search users
@@ -46,7 +46,7 @@ app.delete("/users/:id", validateUserId,userController.deleteUser); // Delete us
 
 app.get("/requests", reqcontroller.getAllRequests);
 app.get("/requests/:id",validateRequestId, reqcontroller.getRequestById);
-app.post("/requests", validateRequest, reqcontroller.createRequest);
+app.post("/requests", reqcontroller.createRequest);
 app.put("/requests/:id", validateRequestId,reqcontroller.updateRequest);
 app.delete("/requests/:id", validateRequestId, reqcontroller.deleteRequest);
 

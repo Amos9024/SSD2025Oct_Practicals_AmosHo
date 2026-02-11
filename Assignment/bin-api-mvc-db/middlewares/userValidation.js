@@ -83,18 +83,18 @@ function validatePassword(req, res, next) {
   next();
 }
 
-function validateStatus(req, res, next) {
+function validateRole(req, res, next) {
   // Get role from request body, convert to lowercase and trim whitespace 
-  const { Status } = req.body 
-  if (!Status || typeof Status !== 'string' ) {
-    return res.status(400).json({error: "Status is required"});
+  const { Role } = req.body 
+  if (!Role || typeof Role !== 'string' ) {
+    return res.status(400).json({error: "Role is required"});
   }
   
-  const statusUpper = Status.toUpperCase().trim();
+  const roleUpper = Role.toUpperCase().trim();
   // Check if the role is valid
-  validStatuses = ['A', 'N'];
-  if (!validStatuses.includes(statusUpper)) {   
-    return res.status(400).json({error: "Status must be either of: " + validStatuses.join(", ")});
+  validRoles = ['MEMBER', 'ADMIN'];
+  if (!validRoles.includes(roleUpper)) {   
+    return res.status(400).json({error: "Role must be either of: " + validRoles.join(", ")});
   }
   
   // If validation succeeds, pass control to the next middleware/route handler
@@ -124,6 +124,6 @@ module.exports = {
   validateUser,
   validateUserId,
   validatePassword,
-  validateStatus,
+  validateRole,
   validateDateJoined,
 };

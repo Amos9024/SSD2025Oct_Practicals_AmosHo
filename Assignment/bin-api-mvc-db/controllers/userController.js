@@ -30,7 +30,7 @@ async function getUserById(req, res) {
 
 // Create new user
 async function registerUser(req, res) {
-  const { Name, EmailAddr, Status, DateJoined, Password } = req.body;
+  const { Name, EmailAddr, Role, DateJoined, Password } = req.body;
 
   try { 
     // Check for existing username
@@ -47,7 +47,7 @@ async function registerUser(req, res) {
     const userData = {
       Name: Name,
       EmailAddr: EmailAddr,
-      Status: Status,
+      Role: Role,
       DateJoined: DateJoined,
       PasswordHash: hashedPassword,
     };

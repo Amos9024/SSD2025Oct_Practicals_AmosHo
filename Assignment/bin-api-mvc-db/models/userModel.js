@@ -88,12 +88,12 @@ async function createUser(userData) {
   try {
     connection = await sql.connect(dbConfig);
     const query =
-      "INSERT INTO Users (Name, EmailAddr, Contact, Status, DateJoined, PasswordHash) VALUES (@Name, @EmailAddr, @Contact, @Status, @DateJoined, @PasswordHash); SELECT SCOPE_IDENTITY() AS id;";
+      "INSERT INTO Users (Name, EmailAddr, Contact, Role, DateJoined, PasswordHash) VALUES (@Name, @EmailAddr, @Contact, @Role, @DateJoined, @PasswordHash); SELECT SCOPE_IDENTITY() AS id;";
     const request = connection.request();
     request.input("Name", userData.Name);
     request.input("EmailAddr", userData.EmailAddr);
     request.input("Contact", userData.Contact);
-    request.input("Status", userData.Status);
+    request.input("Role", userData.Role);
     request.input("DateJoined", userData.DateJoined);
     request.input("PasswordHash", userData.PasswordHash);
     const result = await request.query(query);
@@ -120,12 +120,12 @@ async function updateUser(id, userData) {
   try {
     connection = await sql.connect(dbConfig);
     const query =
-      "UPDATE Users SET Name = @Name, EmailAddr = @EmailAddr, Contact = @Contact, Status = @Status WHERE UserID = @UserID;"; // Name is SQL column name, @Name is parameter, Map from right to left
+      "UPDATE Users SET Name = @Name, EmailAddr = @EmailAddr, Contact = @Contact, Role = @Role WHERE UserID = @UserID;"; // Name is SQL column name, @Name is parameter, Map from right to left
     const request = connection.request();
     request.input("Name", userData.Name);
     request.input("EmailAddr", userData.EmailAddr);
     request.input("Contact", userData.Contact);
-    request.input("Status", userData.Status);
+    request.input("Role", userData.Role);
     request.input("UserID", id);
     const result = await request.query(query);
     return result.rowsAffected[0];
