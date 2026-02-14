@@ -44,6 +44,7 @@ app.get("/users/:id",validateUserId,userController.getUserById); // Get user by 
 app.put("/users/:id",validateUserId,  userController.updateUser); // Update user
 app.delete("/users/:id", validateUserId,userController.deleteUser); // Delete user
 
+
 app.get("/requests", reqcontroller.getAllRequests);
 app.get("/requests/:id",validateRequestId, reqcontroller.getRequestById);
 app.post("/requests", reqcontroller.createRequest);

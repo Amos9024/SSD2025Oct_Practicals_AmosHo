@@ -7,6 +7,7 @@ CREATE TABLE DisposalRequest (
 	ModelName    varchar(50) NOT NULL,
 	Brand        varchar(50) NULL,
 	Weight		 smallint NOT NULL,
+	isDeleted	 INT NOT NULL,
 	CONSTRAINT   PK_DisposalRequest PRIMARY KEY (DisposalID),
 	CONSTRAINT   FK_DisposalRequest_Bin FOREIGN KEY (BinID) REFERENCES Bins(BinID),
 	CONSTRAINT   FK_DisposalRequest_User FOREIGN KEY (UserID) REFERENCES Users(UserID),
